@@ -125,13 +125,13 @@ def comparison_plot(q, radius):
             axes[row, 1].plot(x, 100 * np.abs(pred / y - 1), color=color, ls=linestyle, lw=lw)
         for ax in axes[row]:
             ax.grid(alpha=0.2)
-            ax.set_xlabel(r"Mass ratio $q=\frac{M_1}{M_2}$")
+            ax.set_xlabel(r"Mass ratio $q=M_1/M_2$")
             if not lower:
                 ax.set_xscale("log")
                 ax.set_xlim(1e-5, 1e5)
             else:
                 ax.set_xlim(1e-3, 3)
-        axes[row, 0].set_ylabel(r"Normalized radius $\frac{R_{\rm L}}{a}$")
+        axes[row, 0].set_ylabel(r"Normalized radius $R_{\rm L}/a$")
         axes[row, 1].set_ylabel("Absolute relative error (%)")
     axes[0, 0].set_yscale("log")
     axes[0, 0].set_title(r"Reference samples: $10^{-5}\leq q\leq10^5$")
