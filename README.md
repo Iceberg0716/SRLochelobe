@@ -88,7 +88,24 @@ This recomputes the five displayed formulas with their coefficients fixed, regen
 
 The independent calculation uses bracketed root finding and tensor-product Gauss-Legendre quadrature rather than the historical secant/adaptive-quadrature procedure. It checks the same full Roche model using a different numerical implementation. On the 41 new points, increasing the quadrature order from 48 to 96 changes radii by at most approximately 9.44e-8 in relative terms. This comparison is a convergence check, not a rigorous error bound or a proof of extrapolation accuracy.
 
-The limiting model as q tends to infinity gives R_L/a approximately 0.8148856768; the SR expression tends to 0.8145969078. Full details and error metrics are in the numerical output files. The historical timing environment was not recorded, so this repository does not claim to reproduce the original timing measurements.
+The limiting model as q tends to infinity gives R_L/a approximately 0.8148856768; the SR expression tends to 0.8145969078. Full details and error metrics are in the numerical output files.
+
+## Evaluation-speed benchmark
+
+```bash
+python analysis/benchmark_evaluation.py
+```
+
+Both formulas evaluate the same contiguous array of 10 million float64 mass ratios, sampled uniformly in log10(q) on [-5, 5] with PCG64 seed 20261016. Each formula receives two full-size warm-up calls and ten timed calls, with alternating order. The Eggleton implementation computes cbrt(q) once, reuses its square, and uses log1p. Timing includes formula evaluation and temporary/result-array allocations, excluding input generation, warm-up, validation, file output, and result deallocation. The script checks agreement with the literal formulas before measuring.
+
+The recorded experiment used an Intel Core i7-13650HX, Windows 11, Python 3.13.7, and NumPy 2.2.6 on 2026-10-16:
+
+| Formula | Median (s) | Interquartile range (s) |
+| --- | --- | --- |
+| Eggleton | 0.33071655 | 0.3138468–0.337934175 |
+| SR | 0.25778330 | 0.255482825–0.261442975 |
+
+The ratio of median times is 1.2829, corresponding to a 22.1% reduction for SR. The script writes `data/timing_benchmark.json` with the protocol and environment, and `data/timing_trials.csv` with all 20 trial times. Batch size, repeats, warm-ups, seed, and output directory can be changed through command-line options. Running the same protocol on another system produces a new timing record.
 
 ## Method references
 
