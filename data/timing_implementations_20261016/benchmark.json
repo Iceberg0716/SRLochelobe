@@ -1,0 +1,133 @@
+{
+  "environment": {
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "python": "3.13.7",
+    "numpy": "2.2.6",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "protocol": {
+    "batch_size": 10000000,
+    "dtype": "float64",
+    "seed": 20261016,
+    "input_sha256": "adfe982b82b942d8d0ee9c46726d1bbaf4295d3660e5029474b4e3cb302340bd",
+    "q_distribution": "uniform log10(q) in [-5,5]",
+    "warmups_per_method": 2,
+    "trials_per_method": 10,
+    "order": "cyclic rotation; each method occupies each position twice",
+    "timer": "perf_counter_ns; formula evaluation and temporary/result allocations included",
+    "excludes": "input generation, warmups, correctness checks, result deallocation, file I/O"
+  },
+  "implementations": {
+    "Egg_shared": "shared cbrt(q), t*t, log1p(t)",
+    "Egg_no_reuse": "three cbrt(q) calls; two squares; log1p; no saved intermediate",
+    "Egg_literal": "q**(2/3) twice; q**(1/3); log(1+...)",
+    "SR_cbrt": "sqrt and cbrt, as in preceding benchmarks",
+    "SR_literal": "sqrt and **(1/3)"
+  },
+  "correctness": "all methods match their literal formula to rtol=2e-14 on 257 probes",
+  "timing": {
+    "Egg_shared": {
+      "median_seconds": 0.31393085,
+      "q25_seconds": 0.312683325,
+      "q75_seconds": 0.314625375,
+      "all_seconds": [
+        0.3147741,
+        0.3141792,
+        0.3115235,
+        0.3134937,
+        0.3141114,
+        0.3110614,
+        0.3225758,
+        0.3124132,
+        0.3151462,
+        0.3137503
+      ]
+    },
+    "Egg_no_reuse": {
+      "median_seconds": 0.6377764,
+      "q25_seconds": 0.63653095,
+      "q75_seconds": 0.6416617250000001,
+      "all_seconds": [
+        0.6378294,
+        0.6371668,
+        0.6360374,
+        0.6420137,
+        0.6377234,
+        0.636319,
+        0.6431842,
+        0.647599,
+        0.6406058,
+        0.6360693
+      ]
+    },
+    "Egg_literal": {
+      "median_seconds": 0.4502973,
+      "q25_seconds": 0.44842930000000003,
+      "q75_seconds": 0.45233295,
+      "all_seconds": [
+        0.4507471,
+        0.4590611,
+        0.4489234,
+        0.4523418,
+        0.4461802,
+        0.4534414,
+        0.4482646,
+        0.4498475,
+        0.4470228,
+        0.4523064
+      ]
+    },
+    "SR_cbrt": {
+      "median_seconds": 0.2447287,
+      "q25_seconds": 0.2428155,
+      "q75_seconds": 0.246073,
+      "all_seconds": [
+        0.2432088,
+        0.2483494,
+        0.244366,
+        0.2461804,
+        0.2416523,
+        0.2450914,
+        0.2457508,
+        0.2426844,
+        0.246211,
+        0.2397616
+      ]
+    },
+    "SR_literal": {
+      "median_seconds": 0.21663995,
+      "q25_seconds": 0.214278075,
+      "q75_seconds": 0.220890825,
+      "all_seconds": [
+        0.2167425,
+        0.2211735,
+        0.2130471,
+        0.2135762,
+        0.2236184,
+        0.2200428,
+        0.2165374,
+        0.2124953,
+        0.2163837,
+        0.2237046
+      ]
+    }
+  },
+  "comparisons": {
+    "Egg_shared_over_SR_cbrt": {
+      "ratio_of_median_times": 1.2827708805710158,
+      "maximum_same_round_ratio": 1.3126134279115267
+    },
+    "Egg_no_reuse_over_SR_cbrt": {
+      "ratio_of_median_times": 2.606054786381818,
+      "maximum_same_round_ratio": 2.6684821933342238
+    },
+    "Egg_literal_over_SR_cbrt": {
+      "ratio_of_median_times": 1.839985665759676,
+      "maximum_same_round_ratio": 1.8864839073479658
+    },
+    "Egg_literal_over_SR_literal": {
+      "ratio_of_median_times": 2.0785515321620043,
+      "maximum_same_round_ratio": 2.1179410439927295
+    }
+  }
+}

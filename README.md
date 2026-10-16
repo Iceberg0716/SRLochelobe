@@ -93,19 +93,28 @@ The limiting model as q tends to infinity gives R_L/a approximately 0.8148856768
 ## Evaluation-speed benchmark
 
 ```bash
-python analysis/benchmark_evaluation.py
+python analysis/benchmark_implementations.py
 ```
 
-Both formulas evaluate the same contiguous array of 10 million float64 mass ratios, sampled uniformly in log10(q) on [-5, 5] with PCG64 seed 20261016. Each formula receives two full-size warm-up calls and ten timed calls, with alternating order. The Eggleton implementation computes cbrt(q) once, reuses its square, and uses log1p. Timing includes formula evaluation and temporary/result-array allocations, excluding input generation, warm-up, validation, file output, and result deallocation. The script checks agreement with the literal formulas before measuring.
+The manuscript benchmark compares direct NumPy implementations of the two displayed formulas:
 
-The recorded experiment used an Intel Core i7-13650HX, Windows 11, Python 3.13.7, and NumPy 2.2.6 on 2026-10-16:
+```python
+Egg = 0.49*q**(2/3) / (0.6*q**(2/3) + np.log(1 + q**(1/3)))
+SR = (q / (7.6*np.sqrt(q) + 1.85*q + 8.8))**(1/3)
+```
 
-| Formula | Median (s) | Interquartile range (s) |
+The same contiguous array of 10 million float64 mass ratios is used throughout, sampled uniformly in log10(q) on [-5, 5] with PCG64 seed 20261016. Each implementation receives two warm-up calls and ten timed calls. The script cycles through five equivalent implementations, with each occupying every evaluation-order position twice. The paper uses the records named `Egg_literal` and `SR_literal`.
+
+Timing includes formula evaluation and temporary/result-array allocations, excluding input generation, warm-up, validation, result deallocation, and file output. All implementations are checked for agreement with the corresponding mathematical formula before timing.
+
+The experiment used an Intel Core i7-13650HX, Windows 11, Python 3.13.7, and NumPy 2.2.6:
+
+| Direct implementation | Median (s) | Interquartile range (s) |
 | --- | --- | --- |
-| Eggleton | 0.33071655 | 0.3138468–0.337934175 |
-| SR | 0.25778330 | 0.255482825–0.261442975 |
+| Eggleton | 0.45029730 | 0.44842930--0.45233295 |
+| SR | 0.21663995 | 0.214278075--0.220890825 |
 
-The ratio of median times is 1.2829, corresponding to a 22.1% reduction for SR. The script writes `data/timing_benchmark.json` with the protocol and environment, and `data/timing_trials.csv` with all 20 trial times. Batch size, repeats, warm-ups, seed, and output directory can be changed through command-line options. Running the same protocol on another system produces a new timing record.
+The ratio of median times is **2.07855**, reported as **2.08-fold** in the manuscript. The complete protocol, implementation descriptions, and timing results are in `data/timing_implementations_20261016/benchmark.json`; all individual measurements are in `data/timing_implementations_20261016/trials.csv`. Re-running the script produces a new record on the executing system.
 
 ## Method references
 
